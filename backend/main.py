@@ -1,9 +1,11 @@
-import uvicorn
-from fastapi import FastAPI, HTTPException
+import os
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from rag_query import answer_question
+from .rag_query import answer_question
 
 app = FastAPI(
     title="Ragfolio RAG API",
@@ -35,7 +37,7 @@ class AskResponse(BaseModel):
     answer: str
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     """
     Simple health check endpoint.
@@ -43,7 +45,7 @@ async def health():
     return {"status": "ok"}
 
 
-@app.post("/ask", response_model=AskResponse)
+@app.post("/api/ask", response_model=AskResponse)
 async def ask(request: AskRequest):
     """
     Primary RAG endpoint that takes a user question, retrieves context,
@@ -68,5 +70,26 @@ async def ask(request: AskRequest):
         )
 
 
+# Serve Frontend Static Files (only in production)
+FRONTEND_DIST_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+
+if os.path.exists(FRONTEND_DIST_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST_DIR, "assets")), name="static")
+
+    @app.get("/{full_path:path}")
+    async def serve_react_app(request: Request, full_path: str):
+        # Allow /api to pass through
+        if full_path.startswith("api"):
+            raise HTTPException(status_code=404)
+        
+        # Look for the file in the frontend/dist folder
+        file_path = os.path.join(FRONTEND_DIST_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        # Default to React's index.html
+        return FileResponse(os.path.join(FRONTEND_DIST_DIR, "index.html"))
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

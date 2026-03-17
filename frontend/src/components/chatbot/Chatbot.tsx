@@ -31,7 +31,9 @@ export function Chatbot() {
     setLoading(true)
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? '/api' : '')
+      // In production, the backend serves the frontend from the same origin, so we use a relative path
+      // In development, you would set VITE_API_BASE_URL=http://localhost:8000 in your .env
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
       const response = await fetch(`${apiBaseUrl}/ask`, {
         method: 'POST',
         headers: {
