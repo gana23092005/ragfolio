@@ -13,8 +13,17 @@ export function Projects() {
             whileHover={{ scale: 1.02 }}
             className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-default"
           >
-            <h3 className="font-medium text-white text-lg">Project one</h3>
-            <p className="text-sm text-zinc-400 mt-2 leading-relaxed">Short description of the project and technologies used.</p>
+            <h3 className="font-medium text-white text-lg">Network Security Analytics</h3>
+            <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
+              An AI-driven platform for real-time network threat detection and analytics.
+              Built using Python and Machine Learning to identify anomalies and security
+              threats as they occur across network traffic.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {['Python', 'Machine Learning', 'Network Security', 'Linux'].map(tag => (
+                <span key={tag} className="px-2 py-1 rounded-md bg-zinc-800 text-zinc-400 text-xs">{tag}</span>
+              ))}
+            </div>
           </motion.div>
 
           <motion.div
@@ -25,8 +34,17 @@ export function Projects() {
             whileHover={{ scale: 1.02 }}
             className="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-default"
           >
-            <h3 className="font-medium text-white text-lg">Project two</h3>
-            <p className="text-sm text-zinc-400 mt-2 leading-relaxed">Short description of the project and technologies used.</p>
+            <h3 className="font-medium text-white text-lg">Ragfolio — AI Portfolio Chatbot</h3>
+            <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
+              A RAG-powered portfolio chatbot that answers questions about skills,
+              projects, and experience using AI. Built with FastAPI, ChromaDB,
+              and Google Gemini as part of a hands-on DevOps learning project.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-4">
+              {['FastAPI', 'Python', 'ChromaDB', 'Gemini', 'React'].map(tag => (
+                <span key={tag} className="px-2 py-1 rounded-md bg-zinc-800 text-zinc-400 text-xs">{tag}</span>
+              ))}
+            </div>
           </motion.div>
         </div>
       </div>

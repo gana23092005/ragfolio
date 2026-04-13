@@ -161,4 +161,21 @@ The goal is maximum retrieval accuracy when a chatbot answers questions about th
 
 Now convert the following resume into a detailed RAG knowledge document.
 
-[PASTE RESUME HERE]
+Name: Gana R
+Phone: +91 8147577846
+Email: gana.rajendra@gmail.com
+Location: Byndoor, Dist - Udupi
+
+Career Objective: Aspiring DevOps Engineer with skills in Python, Linux, Git, Docker, AWS, Azure, CI/CD, and Network Security.
+
+Education: BE Computer Science Engineering, Yenepoya Institute of Technology, Moodbidri. 2023-2027. CGPA: 9.0
+
+Certifications: IBM - Rapid Development for AI Services, Microsoft Azure Fundamentals AZ-900, Understanding Agentic AI, NPTEL Cyber Security and Privacy
+
+Skills: Python, Linux, Git, AWS, Docker, Machine Learning, GitHub, Firebase, Vercel, CI/CD, Cloud Computing, Network Security
+
+Projects: Network Security Analytics - AI-driven platform for real-time network threat detection
+
+Hackathons: SOLVE-A-THON 1.0 National Hackathon Feb 2026, MAKEFORMANGALURU Make-a-thon Aug 2025
+
+Languages: English Fluent, French Fluent, Spanish Intermediate, German Basic

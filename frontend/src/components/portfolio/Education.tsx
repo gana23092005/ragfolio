@@ -13,12 +13,14 @@ export function Education() {
                         className="p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/80 hover:bg-zinc-900/50 transition-all"
                     >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
-                            <h3 className="text-lg font-medium text-white">Degree Name</h3>
-                            <span className="text-sm text-zinc-500 font-mono">Graduation Year</span>
+                            <h3 className="text-lg font-medium text-white">BE in Computer Science Engineering</h3>
+                            <span className="text-sm text-zinc-500 font-mono">2023 – 2027</span>
                         </div>
-                        <p className="text-zinc-400">University or Institution Name</p>
+                        <p className="text-zinc-400">Yenepoya Institute of Technology, Moodbidri</p>
                         <p className="text-sm text-zinc-500 mt-4 leading-relaxed italic">
-                            Relevant coursework or honors that showcase your academic excellence and specialized knowledge.
+                            Current CGPA: 9.0 — Certifications in Azure AZ-900 (Microsoft),
+                            Rapid Development for AI Services (IBM), Cyber Security & Privacy (NPTEL),
+                            and Understanding Agentic AI.
                         </p>
                     </motion.div>
                 </div>

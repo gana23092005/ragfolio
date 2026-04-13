@@ -2,10 +2,10 @@ import { motion } from 'framer-motion'
 
 export function Skills() {
     const categories = [
-        { name: 'Languages', skills: ['JavaScript', 'TypeScript', 'Python', 'Go'] },
-        { name: 'Frontend', skills: ['React', 'Next.js', 'Tailwind CSS'] },
-        { name: 'Backend', skills: ['Node.js', 'FastAPI', 'PostgreSQL'] },
-        { name: 'Tools', skills: ['Git', 'Docker', 'AWS'] },
+        { name: 'Languages', skills: ['Python', 'Kotlin', 'Java', 'Bash'] },
+        { name: 'Cloud & DevOps', skills: ['AWS', 'Azure', 'Docker', 'CI/CD'] },
+        { name: 'Tools', skills: ['Git', 'GitHub', 'Firebase', 'Vercel'] },
+        { name: 'Concepts', skills: ['Machine Learning', 'Network Security', 'Cloud Computing', 'Linux'] },
     ]
 
     return (

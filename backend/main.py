@@ -1,27 +1,30 @@
-import os
+"""
+RAG Chatbot Backend - FastAPI Controller
+Orchestration layer between frontend and RAG query engine.
+"""
+
 import logging
+import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from typing import Any, Dict
-try:
-    from .rag_query import answer_question
-except ImportError:
-    from rag_query import answer_question
+from rag_query import answer_question
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("ragfolio")
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+)
+logger = logging.getLogger("ragfolio.backend")
 
+# Initialize FastAPI app
 app = FastAPI(
     title="Ragfolio RAG API",
-    description="An orchestration layer for querying resume data using RAG.",
-    version="1.0.0",
+    description="FastAPI backend for Resume RAG chatbot powered by Gemini",
+    version="1.0.0"
 )
 
-# CORS Configuration for development flexibility
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,93 +33,67 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    """
-    Middleware to log request start and end with latency.
-    """
-    logger.debug(f"Request start: {request.method} {request.url}")
-    response = await call_next(request)
-    logger.debug(f"Request end: {request.method} {request.url} - Status: {response.status_code}")
-    return response
-
+# Data Models
 class AskRequest(BaseModel):
-    """
-    Schema for the RAG query request.
-    """
     question: str
 
-
 class AskResponse(BaseModel):
-    """
-    Schema for the RAG query response.
-    """
     answer: str
 
 
+# Middleware for request logging
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    logger.debug(f"Request started: {request.method} {request.url.path}")
+    response = await call_next(request)
+    latency = time.time() - start_time
+    logger.debug(
+        f"Request completed: {request.method} {request.url.path} "
+        f"| Status: {response.status_code} | Latency: {latency:.3f}s"
+    )
+    return response
+
+
+# Health Check Endpoint
 @app.get("/api/health")
-async def health():
-    """
-    Simple health check endpoint.
-    """
+async def health_check():
+    """Health check endpoint to verify the API is running."""
+    logger.debug("Health check called")
     return {"status": "ok"}
 
 
+# Primary RAG Endpoint
 @app.post("/api/ask", response_model=AskResponse)
-async def ask(request: AskRequest):
+async def ask_question(request: AskRequest):
     """
-    Primary RAG endpoint that takes a user question, retrieves context,
-    and returns an AI-generated answer.
+    Accept a question and return an AI-generated answer using RAG.
+    Validates input, calls the RAG engine, and returns the response.
     """
-    # Validate that the question is not empty or whitespace-only
+    logger.debug(f"Incoming question: {request.question!r}")
+
+    # Validate question
     if not request.question or not request.question.strip():
-        logger.debug("Validation failed: Question is empty or whitespace only.")
+        logger.warning("Empty or whitespace-only question received")
         raise HTTPException(
             status_code=400,
-            detail="Question cannot be empty or whitespace only.",
+            detail="Question must not be empty or whitespace."
         )
 
     try:
-        # Log the incoming question
-        logger.debug(f"Incoming question: {request.question}")
-
-        # Integrate with the RAG query engine
         answer = answer_question(request.question)
-
-        # Log the response
-        logger.debug(f"Generated answer: {answer}")
-
+        logger.debug(f"Gemini output: {answer!r}")
         return AskResponse(answer=answer)
+
     except Exception as e:
-        # Log the exception with stack trace
-        logger.exception("An error occurred during RAG processing.")
+        logger.exception(f"Error during RAG processing: {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"An error occurred during RAG processing: {str(e)}",
+            detail=f"Internal server error during RAG processing: {str(e)}"
         )
 
 
-# Serve Frontend Static Files (only in production)
-FRONTEND_DIST_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
-
-if os.path.exists(FRONTEND_DIST_DIR):
-    app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST_DIR, "assets")), name="static")
-
-    @app.get("/{full_path:path}")
-    async def serve_react_app(request: Request, full_path: str):
-        # Allow /api to pass through
-        if full_path.startswith("api"):
-            raise HTTPException(status_code=404)
-        
-        # Look for the file in the frontend/dist folder
-        file_path = os.path.join(FRONTEND_DIST_DIR, full_path)
-        if os.path.isfile(file_path):
-            return FileResponse(file_path)
-            
-        # Default to React's index.html
-        return FileResponse(os.path.join(FRONTEND_DIST_DIR, "index.html"))
-
+# Server startup
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-

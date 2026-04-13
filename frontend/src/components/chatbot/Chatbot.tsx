@@ -8,7 +8,10 @@ type Message = { role: 'user' | 'assistant'; content: string }
 export function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
+  const [backendOnline, setBackendOnline] = useState<boolean | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
 
   const scrollToBottom = () => {
     if (scrollContainerRef.current) {
@@ -23,6 +26,30 @@ export function Chatbot() {
     scrollToBottom()
   }, [messages, loading])
 
+  // Health check function
+  const checkHealth = async () => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5000)
+    try {
+      const response = await fetch(`${apiBaseUrl}/health`, {
+        method: 'GET',
+        signal: controller.signal,
+      })
+      setBackendOnline(response.ok)
+    } catch {
+      setBackendOnline(false)
+    } finally {
+      clearTimeout(timeout)
+    }
+  }
+
+  // Run health check on mount and every 10 seconds
+  useEffect(() => {
+    checkHealth()
+    const interval = setInterval(checkHealth, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
   const handleSend = async (content: string) => {
     if (!content.trim()) return
 
@@ -31,9 +58,6 @@ export function Chatbot() {
     setLoading(true)
 
     try {
-      // In production, the backend serves the frontend from the same origin, so we use a relative path
-      // In development, you would set VITE_API_BASE_URL=http://localhost:8000 in your .env
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
       const response = await fetch(`${apiBaseUrl}/ask`, {
         method: 'POST',
         headers: {
@@ -65,6 +89,20 @@ export function Chatbot() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
       <div className="max-w-4xl mx-auto">
+
+        {/* Backend Status Indicator */}
+        <div className="flex justify-end mb-2">
+          <span className={`text-xs font-medium px-3 py-1 rounded-full border ${
+            backendOnline === null
+              ? 'text-zinc-400 border-zinc-700 bg-zinc-800/50'
+              : backendOnline
+              ? 'text-green-400 border-green-700 bg-green-900/30'
+              : 'text-red-400 border-red-700 bg-red-900/30'
+          }`}>
+            {backendOnline === null ? 'Backend: Checking...' : backendOnline ? 'Backend: Online' : 'Backend: Offline'}
+          </span>
+        </div>
+
         <motion.div
           layout
           initial={false}
@@ -120,6 +158,5 @@ export function Chatbot() {
         </motion.div>
       </div>
     </section>
-
   )
 }
