@@ -1,4 +1,5 @@
 import os
+os.environ['FASTEMBED_CACHE_PATH'] = '/app/fastembed_cache'
 from typing import List
 
 import chromadb
