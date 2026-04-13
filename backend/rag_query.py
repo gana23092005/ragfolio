@@ -26,7 +26,7 @@ CHROMA_DB_DIR = os.path.join(
 COLLECTION_NAME = "resume_chunks"
 GEMINI_API_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.0-flash-lite:generateContent"
+    "gemini-2.5-flash-lite:generateContent"
 )
 
 
